@@ -1,0 +1,19 @@
+{
+    'pressureValid': True, 
+    'accelValid': True, 
+    'temperature': 0.0, 
+    'pressure': 0.0, 
+    'fusionQPoseValid': True, 
+    'timestamp': 0L, 
+    'compassValid': True, 
+    'compass': (0.0, 0.0, 0.0), 
+    'accel': (0.0, 0.0, 0.0), 
+    'humidity': 0.0, 
+    'gyroValid': True, 
+    'gyro': (0.0, 0.0, 0.0), 
+    'temperatureValid': False, 
+    'humidityValid': True, 
+    'fusionQPose': (0.0, 0.0, 0.0, 0.0), 
+    'fusionPoseValid': True, 
+    'fusionPose': (0.0, 0.0, 0.0)
+}
