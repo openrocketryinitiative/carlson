@@ -12,15 +12,16 @@ class FinAngler():
 
     # takes in a desired force to be applied to the rocket and find the 
     # appropriate fin angles to generate that force
-    # - angle: the dirction in which to apply the force
+    # - push_ angle: the dirction in which to apply the force
     # - force: the magnitude of the force to be applied
     # - spin: the amount of yaw force around the long axis to be applied
-    def calc_angles(self, angle, force, spin):
+    def calc_angles(self, push_angle, force, spin):
+        angle = np.degrees(angle)
         # the component of each fins force that contributes to the desired force
-        in_components  = np.sin(self.fin_angles - (angle/180. * np.pi))     
+        in_components  = np.sin(self.fin_angles - push_angle)     
         in_components  = in_components/np.linalg.norm(in_components)
         # the component of each fins force that is out of axis with the desired force
-        out_components = np.cos(self.fin_angles - (angle/180. * np.pi))     
+        out_components = np.cos(self.fin_angles - push_angle)     
         out_components = out_components/np.linalg.norm(out_components)
         # generate a 3x3 matrix where the rows are the components and ones
         effects_matrix = np.stack((in_components, out_components, np.ones(in_components.shape)))

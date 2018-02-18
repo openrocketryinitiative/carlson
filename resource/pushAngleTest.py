@@ -32,13 +32,32 @@ gyroX = bdata[start:end,11]
 gyroY = bdata[start:end,12]
 gyroZ = bdata[start:end,13]
 
-snaps = np.abs(gyroX) + np.abs(gyroY)
-angles = np.arcsin(np.cos(fuseX)*np.cos(fuseY))
+angles_from_vertical = np.arcsin(np.cos(fuseX)*np.cos(fuseY))
 
-snap_time = times[np.argmax(snaps)]
-flip_time = times[np.argmin(np.abs(angles))]
-total_g = np.linalg.norm(bdata[start:end,8:11], axis=1)*0.3454225352
+# Rx = np.array([
+# 	[1,0,0],
+# 	[0, np.cos(fuseX), -np.sin(fuseX)], 
+# 	[0, np.sin(fuseX), np.cos(fuseX)]
+# 	])
+# Ry = np.array([
+# 	[np.cos(fuseY),0,np.sin(fuseY)], 
+# 	[0,1,0], 
+# 	[-np.sin(fuseY),0,np.cos(fuseY)]
+# 	])
+# Rz = np.array([
+# 	[np.cos(fuseZ), -np.sin(fuseZ), 0], 
+# 	[np.sin(fuseZ), np.cos(fuseZ), 0],
+# 	[0,0,1]
+# 	])
 
+# z_iden = np.array([0,0,1])
+# R = np.matmul(np.matmul(Rx, Ry),Rz)
+# R_on_z = np.matmul(R, z_iden)
+
+# push1 = np.arctan2(R_on_z[1], R_on_z[0])
+push1 = np.arctan2(np.sin(fuseY), np.sin(fuseX))
+push2 = fuseZ
+pushAngle = push1 + push2
 
 # plt.scatter(times, states, label='state', s=6, c='purple', lw=0)   # state
 plt.scatter(times, np.degrees(fuseX), label='fusionX', s=6, c=(1,.3,.3), lw=0)    # fusion X
@@ -53,18 +72,9 @@ plt.scatter(times, np.degrees(fuseZ), label='fusionZ', s=6, c=(.5,0,0), lw=0)   
 # plt.scatter(times, np.degrees(gyroX), label='gyroX', s=6, c=(0,1,0), lw=0)   
 # plt.scatter(times, np.degrees(gyroY), label='gyroY', s=6, c=(0,.75,0), lw=0) 
 # plt.scatter(times, np.degrees(gyroZ), label='gyroZ', s=6, c=(0,.5,0), lw=0)  
-
-# plt.scatter(times, total_g, label = 'total_g', s=6, c=(.8,.2,1), lw=0)
-plt.scatter(times, np.degrees(angles), label = 'cos(r)cos(p)', s=6, c=(0.2,1,0.5),lw=0)
+plt.scatter(times, np.degrees(push1), label = 'push1', s=6, c=(.8, .3, .8),lw=0)
+plt.scatter(times, np.degrees(angles_from_vertical), label = 'cos(r)cos(p)', s=6, c=(0.2,1,0.5),lw=0)
 plt.legend(loc=0)
-# plt.axvline(snap_time, c=(.8,.2,1))
-plt.axvline(x=flip_time, c=(0.2,1,0.5))
-# for i in range(5, 11):
-# 	if i >= 8:
-# 		c = 'b'
-# 	else:
-# 		c = 'r'
-# 	plt.scatter(times, bdata[start:end, 5], label='%ith column' % i, s=6,c=c, lw=0)
 
 # plt.legend()
 plt.show()
