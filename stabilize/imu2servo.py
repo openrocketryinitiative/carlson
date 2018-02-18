@@ -42,21 +42,28 @@ fa.velocity = 1.
 first_yaw = None
 
 def radians_to_us(theta):
-    return theta/np.pi*500 + 1500
-
+    us = theta/np.pi*500 + 1500
+    return max(1000, min(2000, us))
+tic=0
+counter = 0
 while True:
   if imu.IMURead():
     data = imu.getIMUData()
     fusionPose = data["fusionPose"]
+    counter+=1
     #print("r: %f p: %f y: %f" % (math.degrees(fusionPose[0]), 
     #    math.degrees(fusionPose[1]), math.degrees(fusionPose[2])))
     if first_yaw is None:
         first_yaw = fusionPose[2]
-    else:
-        angles = fa.calc_angles(0,0,(fusionPose[2] - first_yaw)/2.)
-        print math.degrees(fusionPose[2] - first_yaw), angles
+    elif counter > 4:
+        counter = 0
+        print time.time() - tic, fusionPose
+        tic = time.time()
+        angles = fa.calc_angles(0,0,(fusionPose[2] - first_yaw)/10.)
+        #print time.time() - tic, math.degrees(fusionPose[2] - first_yaw), angles
         for index, angle in enumerate(angles):
             os.system("echo {}={}us > /dev/servoblaster".format(index,radians_to_us(angle)))
-    
-    time.sleep(poll_interval*1./1000.0)
+
+    # time.sleep(.1)
+    #time.sleep(poll_interval*1./1000.0)
 
