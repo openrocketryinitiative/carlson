@@ -11,7 +11,7 @@ from picamera import PiCamera
 from datetime import datetime
 
 # Define directories (include terminating forward-slash!)
-ROOT      = "/home/pi/explosive-bakery/carlson/"
+ROOT      = "./"
 LOG_DIR   = ROOT + "log/"
 VIDEO_DIR = ROOT + "video/"
 DEBUG_DIR = ROOT + "debug/"
