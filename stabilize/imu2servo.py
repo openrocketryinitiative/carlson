@@ -46,6 +46,7 @@ def radians_to_us(theta):
     return max(1000, min(2000, us))
 tic=0
 counter = 0
+fusionPose = None
 while True:
   if imu.IMURead():
     data = imu.getIMUData()
@@ -55,17 +56,18 @@ while True:
     #    math.degrees(fusionPose[1]), math.degrees(fusionPose[2])))
     if first_yaw is None:
         first_yaw = fusionPose[2]
-    elif counter > 6:
-        counter = 0
-        print time.time() - tic, fusionPose
-        tic = time.time()
-        push_angle = np.arctan2(np.sin(fusionPose[1]), np.sin(fusionPose[0]))  
-        push_force = np.arccos(np.cos(fusionPose[1])*np.cos(fusionPose[0]))/10.
-        angles = fa.calc_angles(push_angle,push_force,(fusionPose[2] - first_yaw)/10.)
-        #angles = fa.calc_angles(0,0,(fusionPose[2] - first_yaw)/10.)
-        #print time.time() - tic, math.degrees(fusionPose[2] - first_yaw), angles
-        for index, angle in enumerate(angles):
-            os.system("echo {}={}us > /dev/servoblaster".format(index,radians_to_us(angle)))
+    #elif counter > 6:
+    #    counter = 0
+  elif fusionPose is not None:
+    print time.time() - tic, fusionPose
+    tic = time.time()
+    push_angle = np.arctan2(np.sin(fusionPose[1]), np.sin(fusionPose[0]))  
+    push_force = np.arccos(np.cos(fusionPose[1])*np.cos(fusionPose[0]))/10.
+    angles = fa.calc_angles(push_angle,push_force,(fusionPose[2] - first_yaw)/10.)
+    #angles = fa.calc_angles(0,0,(fusionPose[2] - first_yaw)/10.)
+    #print time.time() - tic, math.degrees(fusionPose[2] - first_yaw), angles
+    for index, angle in enumerate(angles):
+        os.system("echo {}={}us > /dev/servoblaster".format(index,radians_to_us(angle)))
 
     # time.sleep(.1)
     #time.sleep(poll_interval*1./1000.0)
