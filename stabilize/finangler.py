@@ -16,7 +16,7 @@ class FinAngler():
     # - force: the magnitude of the force to be applied
     # - spin: the amount of yaw force around the long axis to be applied
     def calc_angles(self, push_angle, force, spin):
-        push_angle = np.degrees(push_angle)
+        #push_angle = np.degrees(push_angle)
         # the component of each fins force that contributes to the desired force
         in_components  = np.sin(self.fin_angles - push_angle)     
         in_components  = in_components/np.linalg.norm(in_components)
