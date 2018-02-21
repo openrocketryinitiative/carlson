@@ -8,6 +8,7 @@ import math
 import numpy as np
 from finangler import FinAngler
 from threading import Thread, Lock
+from signal import signal, SIGINT
 
 ############################# IMU SETUP #############################
 SETTINGS_FILE = "RTIMULib"
@@ -37,25 +38,30 @@ poll_interval = imu.IMUGetPollInterval()
 print("Recommended Poll Interval: %dmS\n" % poll_interval)
 
 
+
 def radians_to_us(theta):
     us = theta/np.pi*500 + 1500
     return max(1000, min(2000, us))
 
 
 ############################ SERVO THREAD #############################
+SERVO_WRITE_INTERVAL = 35  # milliseconds
+
 # Shared memory angle values for servos
 _angles             = [0, 0, 0]  # start straight up
 _angles_thread_lock = Lock()
 
 def write_to_servos():
-    _angles_thread_lock.acquire()
-    most_recent_angles = _angles
-    _angles_thread_lock.release()
-    for angle in most_recent_angles:
-        os.system("echo {}={}us > /dev/servoblaster".format(radians_to_us(angle)))
-    time.sleep(0.05)  # 20 Hz update rate, once per 50 ms  # TODO optimize this
+    while True:
+        _angles_thread_lock.acquire()
+        most_recent_angles = _angles
+        _angles_thread_lock.release()
+        for idx, angle in enumerate(most_recent_angles):
+            os.system("echo {}={}us > /dev/servoblaster".format(idx, radians_to_us(angle)))
+        time.sleep(SERVO_WRITE_INTERVAL * 0.001)
     
 servo_thread = Thread(target=write_to_servos)
+servo_thread.daemon = True  # kill this thread if main thread exits
 servo_thread.start()
 print("Started ServoBlaster thread.")
 
