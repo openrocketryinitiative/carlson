@@ -40,7 +40,7 @@ print("Recommended Poll Interval: %dmS\n" % poll_interval)
 
 ############################ SERVO THREAD #############################
 # Shared memory angle values for servos
-_angles             = None
+_angles             = [0, 0, 0]  # start straight up
 _angles_thread_lock = Lock()
 
 def write_to_servos():
