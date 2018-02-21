@@ -37,6 +37,10 @@ poll_interval = imu.IMUGetPollInterval()
 print("Recommended Poll Interval: %dmS\n" % poll_interval)
 
 
+def radians_to_us(theta):
+    us = theta/np.pi*500 + 1500
+    return max(1000, min(2000, us))
+
 
 ############################ SERVO THREAD #############################
 # Shared memory angle values for servos
@@ -62,10 +66,6 @@ os.system('sudo servod --p1pins="11,13,15"')
 fa = FinAngler()
 fa.velocity = 1.
 first_yaw = None
-
-def radians_to_us(theta):
-    us = theta/np.pi*500 + 1500
-    return max(1000, min(2000, us))
 
 tic=0
 counter = 0
