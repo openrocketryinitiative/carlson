@@ -8,7 +8,6 @@ import math
 import numpy as np
 from finangler import FinAngler
 from threading import Thread, Lock
-from signal import signal, SIGINT
 
 ############################# IMU SETUP #############################
 SETTINGS_FILE = "RTIMULib"
@@ -58,7 +57,8 @@ class ServoWriter(object):
         self.servo_write_interval   = servo_write_interval
 
     def start(self):
-        servo_thread.start()
+        os.system('sudo servod --p1pins="11,13,15"')
+        self.thread.start()
         print("Started ServoBlaster thread.")
 
     def push_new_angles(self, new_angles):
@@ -77,9 +77,11 @@ class ServoWriter(object):
         return output_angles
 
     def write_to_servos(self):
-        for angle in self.read_angles():
-            os.system("echo {}={}us > /dev/servoblaster".format(radians_to_us(angle)))
-        time.sleep(self.servo_write_interval * 1000.)
+        while True:
+            for idx, angle in enumerate(self.read_angles()):
+                os.system("echo {}={}us > /dev/servoblaster".format(
+                    idx, radians_to_us(angle)))
+            time.sleep(self.servo_write_interval * 0.001)
     
 
 
@@ -87,7 +89,6 @@ class ServoWriter(object):
 
 
 ############################# SERVO SETUP #############################
-os.system('sudo servod --p1pins="11,13,15"')
 fa = FinAngler()
 servo_writer = ServoWriter(SERVO_WRITE_INTERVAL)
 servo_writer.start()  # start the servo_writer thread
