@@ -47,29 +47,50 @@ def radians_to_us(theta):
 ############################ SERVO THREAD #############################
 SERVO_WRITE_INTERVAL = 35  # milliseconds
 
-# Shared memory angle values for servos
-_angles             = [0, 0, 0]  # start straight up
-_angles_thread_lock = Lock()
 
-def write_to_servos():
-    while True:
-        _angles_thread_lock.acquire()
-        most_recent_angles = _angles
-        _angles_thread_lock.release()
-        for idx, angle in enumerate(most_recent_angles):
-            os.system("echo {}={}us > /dev/servoblaster".format(idx, radians_to_us(angle)))
-        time.sleep(SERVO_WRITE_INTERVAL * 0.001)
+class ServoWriter(object):
+
+    def __init__(self, servo_write_interval):
+        self.angles                 = [0, 0, 0]  # start vertical
+        self.thread                 = Thread(target=self.write_to_servos)
+        self.thread.daemon          = True
+        self.thread_lock            = Lock()
+        self.servo_write_interval   = servo_write_interval
+
+    def start(self):
+        servo_thread.start()
+        print("Started ServoBlaster thread.")
+
+    def push_new_angles(self, new_angles):
+        """Push new angles to the servo writer. Thread safe.
+        """
+        self.thread_lock.acquire()
+        self.angles = new_angles
+        self.thread_lock.release()
+
+    def read_angles(self):
+        """Read angles array. Thread safe.
+        """
+        self.thread_lock.acquire()
+        output_angles = self.angles
+        self.thread_lock.release()
+        return output_angles
+
+    def write_to_servos(self):
+        for angle in self.read_angles():
+            os.system("echo {}={}us > /dev/servoblaster".format(radians_to_us(angle)))
+        time.sleep(self.servo_write_interval * 1000.)
     
-servo_thread = Thread(target=write_to_servos)
-servo_thread.daemon = True  # kill this thread if main thread exits
-servo_thread.start()
-print("Started ServoBlaster thread.")
+
+
 
 
 
 ############################# SERVO SETUP #############################
 os.system('sudo servod --p1pins="11,13,15"')
 fa = FinAngler()
+servo_writer = ServoWriter(SERVO_WRITE_INTERVAL)
+servo_writer.start()  # start the servo_writer thread
 fa.velocity = 1.
 first_yaw = None
 
@@ -100,9 +121,7 @@ while True:
         #print time.time() - tic, math.degrees(fusionPose[2] - first_yaw), angles
 
         # Update shared memory angles to newly computed ones
-        _angles_thread_lock.acquire()
-        _angles = computed_angles
-        _angles_thread_lock.release()
+        servo_writer.push_new_angles(computed_angles)
 
 
         # for index, angle in enumerate(angles):
