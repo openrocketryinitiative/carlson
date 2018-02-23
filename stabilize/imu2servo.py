@@ -1,6 +1,6 @@
 import sys, getopt
+sys.path.append("../lib/")
 
-#sys.path.append('.')
 import RTIMU
 import os
 import time
@@ -8,6 +8,7 @@ import math
 import numpy as np
 from finangler import FinAngler
 from threading import Thread, Lock
+from servowriter import ServoWriter
 
 ############################# IMU SETUP #############################
 SETTINGS_FILE = "RTIMULib"
@@ -38,59 +39,16 @@ print("Recommended Poll Interval: %dmS\n" % poll_interval)
 
 
 
-def radians_to_us(theta):
-    us = theta/np.pi*500 + 1500
-    return max(1000, min(2000, us))
-
-
-############################ SERVO THREAD #############################
-SERVO_WRITE_INTERVAL = 35  # milliseconds
-
-
-class ServoWriter(object):
-
-    def __init__(self, servo_write_interval):
-        self.angles                 = [0, 0, 0]  # start vertical
-        self.thread                 = Thread(target=self.write_to_servos)
-        self.thread.daemon          = True
-        self.thread_lock            = Lock()
-        self.servo_write_interval   = servo_write_interval
-
-    def start(self):
-        os.system('sudo servod --p1pins="11,13,15"')
-        self.thread.start()
-        print("Started ServoBlaster thread.")
-
-    def push_new_angles(self, new_angles):
-        """Push new angles to the servo writer. Thread safe.
-        """
-        self.thread_lock.acquire()
-        self.angles = new_angles
-        self.thread_lock.release()
-
-    def read_angles(self):
-        """Read angles array. Thread safe.
-        """
-        self.thread_lock.acquire()
-        output_angles = self.angles
-        self.thread_lock.release()
-        return output_angles
-
-    def write_to_servos(self):
-        while True:
-            for idx, angle in enumerate(self.read_angles()):
-                os.system("echo {}={}us > /dev/servoblaster".format(
-                    idx, radians_to_us(angle)))
-            time.sleep(self.servo_write_interval * 0.001)
-    
-
+# def radians_to_us(theta):
+#     us = theta/np.pi*500 + 1500
+#     return max(1000, min(2000, us))
 
 
 
 
 ############################# SERVO SETUP #############################
 fa = FinAngler()
-servo_writer = ServoWriter(SERVO_WRITE_INTERVAL)
+servo_writer = ServoWriter()
 servo_writer.start()  # start the servo_writer thread
 fa.velocity = 1.
 first_yaw = None

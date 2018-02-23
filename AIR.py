@@ -8,14 +8,14 @@ import time
 import serial
 import os
 
-import logger as lgr
-import wirelesscommunicator as wc
+import lib.logger as lgr
+import lib.wirelesscommunicator as wc
 import numpy as np
 from math import sqrt
-from state import State
-from telemetry import Telemetry
-from sensor import Sensor
-from gpio import Pin
+from lib.state import State
+from lib.telemetry import Telemetry
+from lib.sensor import Sensor
+from lib.gpio import Pin
 
 HEARTBEAT_DELAY          = 1     # s, how often do we send state to ground station
 

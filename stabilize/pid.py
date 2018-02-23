@@ -1,6 +1,9 @@
 import numpy as np
 
 class PID():
+	"""PID controller.
+	"""
+
 	def __init__(self, kp, ki, kd, control_range=None):
 		self.kp = kp
 		self.ki = ki
@@ -9,6 +12,9 @@ class PID():
 		self.reset()
 
 	def step(self, err, dt):
+		"""Step the PID.
+		"""
+
 		self._int_err += err * dt			# calculate derivative and integral of error
 		d_err = (err - self._prev_err)/dt
 

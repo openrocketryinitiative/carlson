@@ -4,8 +4,8 @@
 #
 # 5 October 2017, Benjamin Shanahan.
 
-from state import State
-from telemetry import Telemetry, PORT
+from lib.state import State
+from lib.telemetry import Telemetry, PORT
 
 import sys
 import threading

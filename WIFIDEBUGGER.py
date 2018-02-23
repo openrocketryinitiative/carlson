@@ -14,7 +14,7 @@
 # 2 November 2017, Benjamin Shanahan.
 
 import array
-import wirelesscommunicator as wc
+import lib.wirelesscommunicator as wc
 
 host_port   = 5001             # Port that Carlson will send to on this computer
 target_ip   = "192.168.1.228"

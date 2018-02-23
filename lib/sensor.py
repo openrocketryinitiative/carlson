@@ -10,6 +10,8 @@ from BMP280 import BMP280
 RTIMU_INI_FILE = "RTIMULib"
 
 class Sensor:
+    """Interface with WaveShare MPU-9255 IMU using RTIMU and BMP280 libraries.
+    """
 
     def __init__(self):
         self._init_imu()

@@ -3,28 +3,44 @@
 # Benjamin Shanahan
 
 class State:
+    """Define different rocket states and provide a convenient interface.
+
+    The defined states each have an assigned bit. This bit corresponds a bit in
+    the command byte. When sending commands between GROUND and AIR, we want to
+    minimize the amount of data transmitted across the radios. To do this, we 
+    only send a single byte, where each of the 8 bits encodes a different 
+    active state. For example, if we send a `7`, this is `0000 0111` in binary,
+    and this means that bits 0, 1, and 2 are high (right to left): i.e. ARM + 
+    LOGGER + CHUTE.
+    """
 
     def __init__(self):
 
-        # Define states and their bit positions
-        self.IDLE          = 0    # default state on rocket boot
+        # Define states and their bit positions in a byte
+        self.IDLE          = 0  # default, no bits high
 
-        self.ARM           = 1    # arm / disarm rocket and allow other functionality
-        self.ARM_BIT       = 0    # bit position
+        # arm / disarm rocket and allow other functionality
+        self.ARM           = 1
+        self.ARM_BIT       = 0
 
-        self.LOGGING       = 2    # start / stop logging sensor and camera data
+        # start / stop logging sensor and camera data
+        self.LOGGING       = 2
         self.LOGGING_BIT   = 1 
 
-        self.CHUTE         = 4    # toggle parachute GPIO pin
+        # toggle parachute GPIO pin
+        self.CHUTE         = 4
         self.CHUTE_BIT     = 2
 
-        self.POWER_OFF     = 8    # shut down Carlson computer
+        # shut down Carlson computer
+        self.POWER_OFF     = 8
         self.POWER_OFF_BIT = 3
 
-        self.FREEFALL      = 16   # accelerometers detected freefall condition
+        # accelerometers detected freefall condition
+        self.FREEFALL      = 16
         self.FREEFALL_BIT  = 4
 
-        self.APOGEE        = 32   # rotation greater than 90 deg from vertical, deploy chute
+        # rotation greater than 90 deg from vertical, deploy chute
+        self.APOGEE        = 32
         self.APOGEE_BIT    = 5
 
         # Define state value holder
@@ -65,4 +81,4 @@ class State:
         if self.get_bit(self.APOGEE_BIT):    ret += "Apogee + "
         if self.get_bit(self.CHUTE_BIT):     ret += "Deployed Chute + "
         if self.get_bit(self.POWER_OFF_BIT): ret += "Powering Off + "
-        return ret[:-3]
+        return ret[:-3]  # remove trailing ' + '

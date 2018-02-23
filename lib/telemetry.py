@@ -11,6 +11,8 @@ SERIAL_TIMEOUT     = 0
 TIME_BEFORE_RESEND = 0.5  # (s) how long to wait before panicking (send again)
 
 class Telemetry:
+    """Initialize and handle communications between telemetry radios.
+    """
 
     def __init__(self, port=PORT, baud=BAUD, timeout=SERIAL_TIMEOUT):
         self.radio = None
