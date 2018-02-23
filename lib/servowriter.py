@@ -1,4 +1,7 @@
+from threading import Thread, Lock
 import numpy as np
+import os
+import time
 
 class ServoWriter(object):
     """Use ServoBlaster library to write PWM to servos on Raspberry Pi 3.
@@ -13,7 +16,7 @@ class ServoWriter(object):
         self.thread                 = Thread(target=self.write_to_servos)
         self.thread.daemon          = True
         self.thread_lock            = Lock()
-        self.servo_write_interval   = 40  # (ms) how often to write to servo?
+        self.servo_write_interval   = 35  # (ms) how often to write to servo?
         self.one_over_pi            = 1 / np.pi
 
     def start(self):

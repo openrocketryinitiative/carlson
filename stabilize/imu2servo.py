@@ -7,7 +7,6 @@ import time
 import math
 import numpy as np
 from finangler import FinAngler
-from threading import Thread, Lock
 from servowriter import ServoWriter
 
 ############################# IMU SETUP #############################
