@@ -9,7 +9,6 @@ import serial
 import os
 
 import lib.logger as lgr
-import lib.wirelesscommunicator as wc
 import numpy as np
 from math import sqrt
 from lib.state import State
@@ -30,8 +29,6 @@ APOGEE_COUNTER_THRESH    = 20    # number of consecutive apogee detections befor
 
 # Should we debug?
 LOG_DEBUG   = True   # Save debug info to a local text file
-# TODO: **important** THIS OPTION (UDP_DEBUG) SHOULD BE FALSE UNLESS MANUALLY SPECIFIED BY A FLAG (ARGPARSER)
-UDP_DEBUG   = True   # Send info across network to another machine on the network
 LOCAL_DEBUG = True   # Print IMU data to terminal directly. Only use if ssh'd into Carlson directly.
 
 def rad2deg(rad):
@@ -64,23 +61,6 @@ if __name__ == "__main__":
     apogee_counter      = 0
 
     ###########################################################################
-    ## Initialize Wireless Communication
-    ###########################################################################
-
-    # TODO: allow IPs and ports to be specified via argparser
-    if UDP_DEBUG:
-        host_port   = 5000             # Carlson's port (local)
-        target_ip   = "192.168.1.228"  # IP of laptop running WIFIDEBUGGER
-        target_port = 5001             # Port on laptop running WIFIDEBUGGER
-        try:
-            wifidebugger = wc.WirelessCommunicator(
-                host_port=host_port, target_ip=target_ip, target_port=target_port)
-            UDP_DEBUG_SOCKET_INIT_OK = True
-        except:
-            print "Failed to bind port for WiFi debugging, skipping."
-            UDP_DEBUG_SOCKET_INIT_OK = False
-
-    ###########################################################################
     ## Initialize our external devices
     ###########################################################################
 
@@ -90,12 +70,6 @@ if __name__ == "__main__":
     # Define debug function
     def debug(text):
         if LOG_DEBUG: logger.write(text, lgr.DEBUG)
-
-    # TODO: reorganize this; add UDP WiFi debugger status to debug file
-    if UDP_DEBUG and UDP_DEBUG_SOCKET_INIT_OK: 
-        debug("UDP debugger initialized OK")
-    else:
-        debug("UDP debugger failed to initialize")
 
     # Initialize telemetry radio for communication with ground station
     radio = Telemetry()
@@ -204,13 +178,9 @@ if __name__ == "__main__":
         ## Do repeated actions (i.e. read from sensors) depending on latches
         #######################################################################
         
-        # If logging is on, write IMU data to logfile! We have yet to implement
-        # sensor logging from the BMP280 because its read speed is slower than
-        # from the IMU.
-        #
-        # We are currently logging 14 data points, which will be transmitted as
-        # 4-byte floats across the wireless network during UDP debugging. This
-        # is 4*14 = 56 bytes (plus header) per UDP packet.
+        # If logging is on, write IMU data to logfile! TODO: We have yet to 
+        # implement sensor logging from the BMP280 because its read speed is 
+        # slower than from the IMU and requires dedicated logic.
         if _logging_on:
             # Read from IMU
             data = sensor.read_imu()
@@ -258,28 +228,17 @@ if __name__ == "__main__":
                             _apogee_detected = True
                     else:
                         apogee_counter = 0
-                
-                # If wifi debugging is enabled, send the data over UDP.
-                if UDP_DEBUG and UDP_DEBUG_SOCKET_INIT_OK:
-                    # Try to send data over UDP, if it fails, just skip, we don't want
-                    # any other part of the code to stop.
-                    try:
-                        wifidebugger.send(data_vector)
-                    except:
-                        pass
 
                 # If local debugging is enabled, print to terminal directly.
                 if LOCAL_DEBUG:
-                    #print "accel: %.2f %.2f %.2f" % (data["accel"])
-
-                    #print "_freefall_detected:", _freefall_detected, \
-                    #        "_apogee_detected:", _apogee_detected
-
-                    print "R: %.2f  P: %.2f  Y: %.2f  ACC_NORM: %.2f  ANGLE: %.2f  FREEFALL: %s  APOGEE: %s" % \
-                           (rad2deg(data["fusionPose"][0]),
-                           rad2deg(data["fusionPose"][1]),
-                           rad2deg(data["fusionPose"][2]),
-                           accel_norm, theta, _freefall_detected, _apogee_detected)
+                    print "R: %.2f  P: %.2f  Y: %.2f  "
+                        "ACC_NORM: %.2f  ANGLE: %.2f  "
+                        "FREEFALL: %s  APOGEE: %s" % (
+                            rad2deg(data["fusionPose"][0]),
+                            rad2deg(data["fusionPose"][1]), 
+                            rad2deg(data["fusionPose"][2]),
+                            accel_norm, theta, _freefall_detected, 
+                            _apogee_detected)
 
         # Set chute pin high if we are using automatic apogee detection algorithm.
         if AUTO_APOGEE_DETECT and _freefall_detected and _armed:
