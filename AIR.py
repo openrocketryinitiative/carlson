@@ -231,14 +231,14 @@ if __name__ == "__main__":
 
                 # If local debugging is enabled, print to terminal directly.
                 if LOCAL_DEBUG:
-                    print "R: %.2f  P: %.2f  Y: %.2f  "
-                        "ACC_NORM: %.2f  ANGLE: %.2f  "
-                        "FREEFALL: %s  APOGEE: %s" % (
+                    print ("R: %.2f  P: %.2f  Y: %.2f  "
+                            "ACC_NORM: %.2f  ANGLE: %.2f  "
+                            "FREEFALL: %s  APOGEE: %s" % (
                             rad2deg(data["fusionPose"][0]),
                             rad2deg(data["fusionPose"][1]), 
                             rad2deg(data["fusionPose"][2]),
                             accel_norm, theta, _freefall_detected, 
-                            _apogee_detected)
+                            _apogee_detected))
 
         # Set chute pin high if we are using automatic apogee detection algorithm.
         if AUTO_APOGEE_DETECT and _freefall_detected and _armed:
