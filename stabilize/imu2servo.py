@@ -47,7 +47,7 @@ print("Recommended Poll Interval: %dmS\n" % poll_interval)
 
 ############################# SERVO SETUP #############################
 fa = FinAngler()
-servo_writer = ServoWriter()
+servo_writer = ServoWriter(35)
 servo_writer.start()  # start the servo_writer thread
 fa.velocity = 1.
 first_yaw = None
@@ -68,8 +68,8 @@ while True:
         #    counter = 0
 
     elif fusionPose is not None:
-        print(time.time()-tic, fusionPose)
-        tic = time.time()
+        # print time.time()-tic, fusionPose
+        # tic = time.time()
         push_angle = np.arctan2(np.sin(fusionPose[1]), np.sin(fusionPose[0]))  
         push_force = np.arccos(np.cos(fusionPose[1])*np.cos(fusionPose[0]))/10.
         computed_angles = fa.calc_angles(
