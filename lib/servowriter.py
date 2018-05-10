@@ -20,6 +20,7 @@ class ServoWriter(object):
         self.thread_lock            = Lock()
         self.servo_write_interval   = servo_write_interval  # (ms) how often to write to servo?
         self.one_over_pi            = 1 / np.pi
+        self.servo_write_order      = [2,1,0]  # write servo motors in this order
 
     def start(self):
         """Start servod (ServoBlaster daemon) on certain pins, and start the 
@@ -59,7 +60,9 @@ class ServoWriter(object):
         """Thread function.
         """
         while True:
-            for idx, angle in enumerate(self.read_angles()):
+            angles = self.read_angles()
+            for motor in self.servo_write_order:
+                angle = angles[motor]
                 os.system("echo {}={}us > /dev/servoblaster".format(
-                    idx, self.radians_to_us(angle)))
+                    motor, self.radians_to_us(angle)))
             time.sleep(self.servo_write_interval * 0.001)
