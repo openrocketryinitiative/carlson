@@ -16,6 +16,30 @@ Follow directions under *Additional Repositories* below to compile and install s
 
 ***IMPORTANT***: If you are using a Raspberry Pi to host AIR.py, please make sure that I2C and Serial hardware are enabled and 'login shell over serial' is disabled. These options can be configured in *Interfacing Options* in `sudo raspi-config`.
 
+## Rocket Servo Setup
+
+### Get the library
+`git clone https://github.com/richardghirst/PiBits.git`
+
+### Install the servoblaster stuff
+```
+cd PiBits/ServoBlaster/user
+sudo make install
+```
+
+### Launch the servoblaster script
+`sudo ./servod --p1pins="11,13,15"`
+
+Servos should be connected to pins 11, 13, 15 (which correspond to GPIO 17, 27, 22)
+
+### set the servos
+```
+echo 0=1500us > /dev/servoblaster
+echo 1=1500us > /dev/servoblaster
+echo 2=1500us > /dev/servoblaster
+```
+
+
 ## AIR station 
 
 Python state machine running on the Raspberry Pi in the rocket that starts and stops data / video logging and can detonate the parachute ejection blast cap in flight. This script sends periodic updates to the GROUND station via telemetry at 1 Hz and listens for incoming state transition commands from GROUND. 

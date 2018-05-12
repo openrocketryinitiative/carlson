@@ -8,9 +8,9 @@ class FinAngler():
     """
 
     def __init__(self):
-        self.fin_angles = [0, 120, 240] # a list of the fins angles in degress
+        self.fin_angles = np.array([0, 120, 240])+30 # a list of the fins angles in degress
         self.fin_angles = np.array(self.fin_angles) / 180. * np.pi
-        self.velocity = 1 #estimated velocity of the rocket in m/s
+        self.velocity   = 1. #estimated velocity of the rocket in m/s
 
     def calc_angles(self, push_angle, force, spin):
         """Takes in a desired force to be applied to the rocket and find the 

@@ -13,9 +13,16 @@ class Sensor:
     """Interface with WaveShare MPU-9255 IMU using RTIMU and BMP280 libraries.
     """
 
-    def __init__(self):
-        self._init_imu()
+    def __init__(self, configFile=RTIMU_INI_FILE):
+        self._init_imu(configFile)
         self._init_barometer()
+        # self.thread = Thread(target=self.)
+
+    def start(self):
+        """Start thread to pull data from the IMU.
+        """
+        self.thread.start()
+        print("Started sensor reading thread")
 
     def read_imu(self):
         if self.imu.IMURead():
@@ -29,9 +36,9 @@ class Sensor:
     def read_barometer_altitude(self):
         return self.barometer.read_altitude()
 
-    def _init_imu(self):
+    def _init_imu(self, configFile):
         # Configure IMU and barometer
-        self.settings = RTIMU.Settings(RTIMU_INI_FILE)  # calibration file
+        self.settings = RTIMU.Settings(configFile)  # calibration file
         self.imu = RTIMU.RTIMU(self.settings)
         if (not self.imu.IMUInit()):
             print "IMU failed to initialize!"

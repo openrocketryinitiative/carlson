@@ -13,7 +13,7 @@ class ServoWriter(object):
     :param int servo_writer_interval: Interval between servo motor writes, in milliseconds.
     """
 
-    def __init__(self, servo_write_interval=35):
+    def __init__(self, servo_write_interval=0):
         self.angles                 = [0, 0, 0]  # start vertical
         self.thread                 = Thread(target=self.write_to_servos)
         self.thread.daemon          = True

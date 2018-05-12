@@ -38,6 +38,8 @@ print("Recommended Poll Interval: %dmS\n" % poll_interval)
 
 
 
+# testing
+
 # def radians_to_us(theta):
 #     us = theta/np.pi*500 + 1500
 #     return max(1000, min(2000, us))
@@ -47,7 +49,7 @@ print("Recommended Poll Interval: %dmS\n" % poll_interval)
 
 ############################# SERVO SETUP #############################
 fa = FinAngler()
-servo_writer = ServoWriter(35)
+servo_writer = ServoWriter(0)
 servo_writer.start()  # start the servo_writer thread
 fa.velocity = 1.
 first_yaw = None
@@ -64,16 +66,20 @@ while True:
         #    math.degrees(fusionPose[1]), math.degrees(fusionPose[2])))
         if first_yaw is None:
             first_yaw = fusionPose[2]
+
+        # print fusionPose
         #elif counter > 6:
         #    counter = 0
 
     elif fusionPose is not None:
         # print time.time()-tic, fusionPose
         # tic = time.time()
-        push_angle = np.arctan2(np.sin(fusionPose[1]), np.sin(fusionPose[0]))  
+        push_angle = np.arctan2(-np.sin(fusionPose[0]), -np.sin(fusionPose[1]))
         push_force = np.arccos(np.cos(fusionPose[1])*np.cos(fusionPose[0]))/10.
         computed_angles = fa.calc_angles(
             push_angle, push_force, (fusionPose[2]-first_yaw) / 10.)
+
+        # print (np.degrees(push_angle), push_force)
 
         #angles = fa.calc_angles(0,0,(fusionPose[2] - first_yaw)/10.)
         #print time.time() - tic, math.degrees(fusionPose[2] - first_yaw), angles
