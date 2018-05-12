@@ -8,21 +8,38 @@ path.insert(0, "../../../lib")
 
 from telemetry import Telemetry
 from time import sleep, time
+from argparse import ArgumentParser
 
-MESSAGE_SIZE = 1     # size of message in bytes
-MESSAGE_RATE = 5    # message interval in Hertz
-N_MESSAGES   = 20  # number of messages to send
+MESSAGE_RATE = 5   # default message interval in Hertz
+N_MESSAGES   = 20  # default number of messages to send
+MESSAGE_SIZE = 1   # default message size in bytes
 
 if __name__ == "__main__":
 
-    # Create and connect to telemetry radio.
+    # parse args from command line
+    parser = ArgumentParser()
+    parser.add_argument("-n", "--number", type=int, default=N_MESSAGES, help="how many messages to send")
+    parser.add_argument("-s", "--size", type=int, default=MESSAGE_SIZE, help="how big is each message in bytes")
+    parser.add_argument("-r", "--rate", type=int, default=MESSAGE_RATE, help="message send rate in Hertz")
+    args = parser.parse_args()
+
+    # create and connect to telemetry radio
     transmitter = Telemetry()
+    firstMessage = True
+    estimatedTime = float(args.number) / float(args.rate)
+    startWrite = 0
+    totalWriteTime = 0
 
-    print "Sending {} messages at {} Hz.".format(N_MESSAGES, MESSAGE_RATE)
-    print "Estimated total time: {} seconds.".format(float(N_MESSAGES) / float(MESSAGE_RATE))
+    print "sending {} messages at {} Hz".format(args.number, args.rate)
+    print "estimated minimum total time (with message send time of 0): {} seconds".format(estimatedTime)
+    print "receiver should receive {} bytes in total".format(args.number * args.size)
     startTime = time()
-    for m in range(N_MESSAGES):
-        transmitter.write("x" * MESSAGE_SIZE)
-        sleep(1.0 / float(MESSAGE_RATE))
+    for m in range(args.number):
+        startWrite = time()
+        transmitter.write("x" * args.size)
+        totalWriteTime = time() - startWrite
+        sleep(1.0 / float(args.rate))
 
-    print "Sent all messages in {} seconds.".format(time() - startTime)
+    elapsedTime = time() - startTime
+    print "sent all messages in {} seconds".format(elapsedTime)
+    print "on average, it took around {} ms to send a {}-byte message".format(totalWriteTime/args.number*1000, args.size)
