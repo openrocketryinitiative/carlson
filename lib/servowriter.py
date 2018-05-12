@@ -14,10 +14,12 @@ class ServoWriter(object):
     """
 
     def __init__(self, servo_write_interval=0):
+        os.system("sudo killall servod")  # kill any running servod processes
         self.angles                 = [0, 0, 0]  # start vertical
         self.thread                 = Thread(target=self.write_to_servos)
         self.thread.daemon          = True
         self.thread_lock            = Lock()
+        self.thread_running         = True
         self.servo_write_interval   = servo_write_interval  # (ms) how often to write to servo?
         self.one_over_pi            = 1 / np.pi
         self.servo_write_order      = [2,1,0]  # write servo motors in this order
@@ -28,7 +30,14 @@ class ServoWriter(object):
         """
         os.system('sudo servod --p1pins="11,13,15"')
         self.thread.start()
-        print("Started ServoBlaster thread.")
+        print("Started servo writer thread.")
+
+    def stop(self):
+        """Stop servo writer thread.
+        """
+        self.thread_running = False
+        os.system("sudo killall servod")
+        print("Stopped servo writer thread.")
 
     def push_new_angles(self, new_angles):
         """Push new angles to the servo writer. Thread safe.
@@ -59,7 +68,7 @@ class ServoWriter(object):
     def write_to_servos(self):
         """Thread function.
         """
-        while True:
+        while self.thread_running:
             angles = self.read_angles()
             for motor in self.servo_write_order:
                 angle = angles[motor]

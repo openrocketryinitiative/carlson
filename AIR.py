@@ -15,21 +15,8 @@ from lib.state import State
 from lib.telemetry import Telemetry
 from lib.sensor import Sensor
 from lib.gpio import Pin
-
-HEARTBEAT_DELAY          = 1     # s, how often do we send state to ground station
-
-BLAST_CAP_BURN_TIME      = 5     # s, how long to keep relay shorted for
-
-FREEFALL_ACCEL_THRESH    = 0.3   # G, maximum absolute acceleration allowed on all axes for freefall detection
-FREEFALL_COUNTER_THRESH  = 20    # number of consecutive freefall detections before flag is set True
-
-AUTO_APOGEE_DETECT       = True  # should we use our auto-apogee detection algorithm to control the chute?
-APOGEE_ANGLE_THRESH      = 5     # deg, angle in degrees combined rocket roll pitch at which we deploy chute
-APOGEE_COUNTER_THRESH    = 20    # number of consecutive apogee detections before we deploy the chute
-
-# Should we debug?
-LOG_DEBUG   = True   # Save debug info to a local text file
-LOCAL_DEBUG = True   # Print IMU data to terminal directly. Only use if ssh'd into Carlson directly.
+from lib.stabilizer import Stabilizer
+from parameters import *
 
 def rad2deg(rad):
     return rad * 57.2958
@@ -78,10 +65,15 @@ if __name__ == "__main__":
     # Initialize the IMU and barometer sensors so that we can read from them
     sensor = Sensor()
     debug("Initialized sensor.")
+    sensor.start()  # start reading from IMU in a new thread
 
     # Initialize the GPIO pins so that we can write them high or low
     chute_pin = Pin(4)
     debug("Initialized chute pin.")
+
+    # Initialize stabilization class.
+    stabilizer = Stabilizer(YAW_PID, RP_PID)
+    debug("Initialized stabilization class.")
 
     # Inline function definitions to control chute pin behavior. Note the 
     # unfortunate global scoping: apparently Python won't allow inline
@@ -105,7 +97,7 @@ if __name__ == "__main__":
     # Main loop
     t0 = 0
     debug("Entering program loop.")
-    while (True):
+    while True:
 
         #######################################################################
         ## Interpret state information from GROUND station
@@ -151,6 +143,7 @@ if __name__ == "__main__":
                     logger.start_video()  # will only do something if camera's enabled
                     t0 = time.time()  # reset reference time
                     _logging_on = True
+                    stabilizer.reset()
                     debug("Started logging")
                     print "Started logging"
             else:
@@ -182,8 +175,8 @@ if __name__ == "__main__":
         # implement sensor logging from the BMP280 because its read speed is 
         # slower than from the IMU and requires dedicated logic.
         if _logging_on:
-            # Read from IMU
-            data = sensor.read_imu()
+            # Get most recently read data from the IMU
+            data = sensor.imu_data
             if data is not None:
                 t = time.time() - t0
                 debug("[%s] Data read" % t)
@@ -228,6 +221,9 @@ if __name__ == "__main__":
                             _apogee_detected = True
                     else:
                         apogee_counter = 0
+
+                # Canard stabilization.
+                stabilizer.step(*data["fusionPose"])
 
                 # If local debugging is enabled, print to terminal directly.
                 if LOCAL_DEBUG:
