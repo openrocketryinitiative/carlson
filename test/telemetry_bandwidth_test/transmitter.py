@@ -4,7 +4,7 @@ from the rocket, in-flight.
 """
 
 from sys import path
-path.insert(0, "../../../lib")
+path.insert(0, "../../lib")
 
 from telemetry import Telemetry
 from time import sleep, time
