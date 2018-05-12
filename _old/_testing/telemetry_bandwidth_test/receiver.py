@@ -3,18 +3,25 @@ Test bandwidth of 915 MHz telemetry radios to explore streaming real-time data
 from the rocket, in-flight.
 """
 
-from sys import path
-path.insert("../../../lib/telemetry.py")
+from sys import path, stdout
+path.insert(0, "../../../lib")
 
-MESSAGE_SIZE = 1  # size of message in bytes
+from telemetry import Telemetry
+from time import time
 
 if __name__ == "__main__":
 
     # Create and connect to telemetry radio.
-    receiver = Telemetry()
+    receiver = Telemetry(port="/dev/ttyUSB0", baud=57600)
 
-    bytesRead = 0
+    print "Waiting for messages to be sent."
+    messagesRead = 0
+    bytesRead    = 0
     while True:
-        received = receiver.read()
-        bytesRead += MESSAGE_SIZE
-        print(x)
+        bytesAvailable = receiver.bytesAvailable()
+        if bytesAvailable > 0:  # bytes are waiting to be read
+            received = receiver.read(bytesAvailable)
+            messagesRead += 1
+            bytesRead    += bytesAvailable
+            stdout.write("#{}:\t{} bytes [{} bytes total]\n".format(
+                messagesRead, bytesAvailable, bytesRead))
