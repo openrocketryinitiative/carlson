@@ -16,30 +16,6 @@ Follow directions under *Additional Repositories* below to compile and install s
 
 ***IMPORTANT***: If you are using a Raspberry Pi to host AIR.py, please make sure that I2C and Serial hardware are enabled and 'login shell over serial' is disabled. These options can be configured in *Interfacing Options* in `sudo raspi-config`.
 
-## Rocket Servo Setup
-
-### Get the library
-`git clone https://github.com/richardghirst/PiBits.git`
-
-### Install the servoblaster stuff
-```
-cd PiBits/ServoBlaster/user
-sudo make install
-```
-
-### Launch the servoblaster script
-`sudo ./servod --p1pins="11,13,15"`
-
-Servos should be connected to pins 11, 13, 15 (which correspond to GPIO 17, 27, 22)
-
-### set the servos
-```
-echo 0=1500us > /dev/servoblaster
-echo 1=1500us > /dev/servoblaster
-echo 2=1500us > /dev/servoblaster
-```
-
-
 ## AIR station 
 
 Python state machine running on the Raspberry Pi in the rocket that starts and stops data / video logging and can detonate the parachute ejection blast cap in flight. This script sends periodic updates to the GROUND station via telemetry at 1 Hz and listens for incoming state transition commands from GROUND. 
@@ -54,22 +30,38 @@ Coming soon. For now, just check out the GROUND.py source code.
 
 ## Additional Repositories 
 
+### ServoBlaster
+
+We use the excellent ServoBlaster tool by [richardghirst] to send commands to the servos. Clone the directory and install:
+
+```
+cd ~
+git clone https://github.com/richardghirst/PiBits.git
+cd PiBits/ServoBlaster/user
+sudo make install
+```
+
+You can test the servos by launching the script and writing commands to `/dev/servoblaster` as follows. Servos should be connected to pins 11, 13, 15 (which correspond to GPIO 17, 27, 22)
+
+```
+sudo ./servod --p1pins="11,13,15"
+echo 0=1500us > /dev/servoblaster
+echo 1=1500us > /dev/servoblaster
+echo 2=1500us > /dev/servoblaster
+```
+
+### RTIMULib2 and BMP280
+
 These repositories have been forked so that we can modify them as required. They both require compilation and installation before they can be used.
 
-### Accel/Gyro/Magnet 
+To read from the WaveShare Accel/Gyro/Magnetometer we use [RTIMULib2](https://github.com/benshanahan1/RTIMULib2). For compilation on Linux systems, see [https://github.com/benshanahan1/RTIMULib2/tree/master/Linux.](https://github.com/benshanahan1/RTIMULib2/tree/master/Linux)
 
-https://github.com/benshanahan1/RTIMULib2
+The library for the BMP280 barometer can be found [here](https://github.com/benshanahan1/BMP280). This is just a C++ python library that needs to be compiled. Run:
 
-For compilation on Linux systems, see https://github.com/benshanahan1/RTIMULib2/tree/master/Linux.
-
-### Barometer 
-
-https://github.com/benshanahan1/BMP280
-
-This is just a C++ python library that needs to be compiled. Run:
-
-	$ sudo python setup.py build
-	$ sudo python setup.py install
+```
+sudo python setup.py build
+sudo python setup.py install
+```
 
 ## Telemetry Link 
 
