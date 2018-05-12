@@ -24,6 +24,9 @@ class Telemetry:
     def read(self, n_bytes=1):
         return self.radio.read(n_bytes)
 
+    def bytesAvailable(self):
+        return self.radio.inWaiting()
+
     # Try to connect to radio at given port
     def _initialize_telemetry(self, port=PORT, baud=BAUD, timeout=SERIAL_TIMEOUT):
         while True:
