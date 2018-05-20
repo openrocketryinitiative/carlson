@@ -16,3 +16,4 @@ Dropbox
 *.swp
 *.swo
 *.h264
+sftp-config.json
