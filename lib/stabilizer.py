@@ -2,7 +2,7 @@ import time
 import numpy as np
 from finangler import FinAngler
 from pid import PID
-from servowriter import ServoWriter
+from servowriter_sync import ServoWriter
 
 class Stabilizer(object):
     """PID controller for angling the rocket canards.
