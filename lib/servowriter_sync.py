@@ -20,7 +20,8 @@ class ServoWriter(object):
         self.one_over_pi            = 1. / np.pi
         self.servo_pins             = [11,13,15]
         os.system("sudo killall servod")
-        os.system("sudo servod --p1pins=\"{}\"".format(str(self.servo_pins[1:-1])))
+        print str(self.servo_pins)[1:-1]
+        os.system("sudo servod --p1pins=\"{}\"".format(str(self.servo_pins)[1:-1]))
 
     def start(self):
         print '[servowriter_sync]: start() does nothing.'
@@ -40,7 +41,7 @@ class ServoWriter(object):
         :param list new_angles: New angles to write to servo motors
         """
         self.angles = new_angles
-        self.us = np.clip(self.new_angles*self.one_over_pi*500.+1500,1000,2000)
+        self.us = np.clip(self.angles*self.one_over_pi*500.+1500,1000,2000)
         for motor, us in enumerate(self.us):
             os.system("echo {}={}us > /dev/servoblaster".format(motor, us))
 

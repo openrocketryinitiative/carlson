@@ -13,8 +13,8 @@ APOGEE_ANGLE_THRESH      = 5     # deg, angle in degrees combined rocket roll pi
 APOGEE_COUNTER_THRESH    = 20    # number of consecutive apogee detections before we deploy the chute
 
 # Should we debug?
-LOG_DEBUG   = True   # Save debug info to a local text file
-LOCAL_DEBUG = True   # Print IMU data to terminal directly. Only use if ssh'd into Carlson directly.
+LOG_DEBUG   = True    # Save debug info to a local text file
+LOCAL_DEBUG = False   # Print IMU data to terminal directly. Only use if ssh'd into Carlson directly.
 
 # Stabilization
 # PID parameters
