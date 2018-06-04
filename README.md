@@ -1,5 +1,9 @@
 # Carlson v0.3
 
+Open-source rocket flight computer: logs IMU data, detects rocket apogee & freefall,  provides in-flight stabilization.
+
+## About Carlson
+
 Carlson is a Raspberry Pi Zero based rocket flight computer with an MPU9255 IMU, BMP280 barometer, 1080p video camera, WiFi chip, and 915 MHz telemetry radio. It runs on a two-cell lithium polymer battery. Carlson will eventually control automatic apogee detection in flight and parachute deployment.
 
 :bangbang: We had the opportunity to give a brief talk at the NASA Rhode Island Space Grant Symposium in Providence, RI about our work on Carlson and motor testing! Check it out on [Google Slides](https://docs.google.com/presentation/d/1OxAxDKqtxr4odVjT6q38U2s4oX1R2K-lVKEJCeqgmxo/edit?usp=sharing).
