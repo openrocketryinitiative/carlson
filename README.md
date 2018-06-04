@@ -92,9 +92,3 @@ We are using a pair of 915 MHz 3DR telemetry radios to communicate between AIR a
 - Run `bash carlson/resource/scp_log_video` to scp all Carlson log and video data to desktop, verify that data is all there and working properly
 - Restart AIR python script on Carlson and start logger (IMU data and video capture)
 - Blast off
-
-## To Do 
-
-1. Calibrate IMU before next flight (check orientation flags for mounting in rocket)
-2. Update requirements/air.txt
-3. Incorporate barometer data
